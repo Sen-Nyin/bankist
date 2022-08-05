@@ -77,6 +77,29 @@ const displayMovements = function (movements) {
   });
 };
 displayMovements(account1.movements);
+
+// Generate usernames - lower case initials of each name.
+// Loop over accounts array using forEach
+// Map over the account.owner property value and create a new property, account.username to store the result
+
+const createUsername = (accounts) => {
+  accounts.forEach((account) => {
+    account.username = account.owner
+      .toLowerCase()
+      .split(" ")
+      .map((name) => name[[0]])
+      .join("");
+  });
+};
+createUsername(accounts);
+// console.log(accounts);
+
+// get the balance
+
+const calcDisplayBalance = (movements) => {
+  labelBalance.textContent = movements.reduce((acc, trans) => acc + trans, 0);
+};
+calcDisplayBalance(account1.movements);
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
