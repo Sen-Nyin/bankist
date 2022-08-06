@@ -158,22 +158,22 @@ btnLogin.addEventListener("click", (e) => {
 
 btnTransfer.addEventListener("click", (e) => {
   e.preventDefault();
-  const transferUserAccount = accounts.find(
+  const recipientAccount = accounts.find(
     (acc) => acc.username === inputTransferTo.value
   );
   const transferAmount = Number(inputTransferAmount.value);
 
   if (
-    transferUserAccount &&
+    recipientAccount &&
     transferAmount > 0 &&
     transferAmount <= currentAccount.balance &&
-    transferUserAccount.username !== currentAccount.username
+    recipientAccount.username !== currentAccount.username
   ) {
-    transferUserAccount.movements.push(transferAmount);
+    recipientAccount.movements.push(transferAmount);
     currentAccount.movements.push(-transferAmount);
-    inputTransferTo.value = inputTransferAmount.value = "";
-    inputTransferTo.blur();
-    inputTransferAmount.blur();
     updateUI(currentAccount);
   }
+  inputTransferTo.value = inputTransferAmount.value = "";
+  inputTransferTo.blur();
+  inputTransferAmount.blur();
 });
