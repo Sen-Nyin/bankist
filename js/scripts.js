@@ -96,13 +96,10 @@ createUsername(accounts);
 
 // get the balance
 
-const calcDisplayBalance = (movements) => {
-  labelBalance.textContent = `€${movements.reduce(
-    (acc, trans) => acc + trans,
-    0
-  )}`;
+const calcDisplayBalance = (acc) => {
+  acc.balance = acc.movements.reduce((acc, trans) => acc + trans, 0);
+  labelBalance.textContent = `€${acc.balance}`;
 };
-calcDisplayBalance(account1.movements);
 
 // get total of deposits
 
@@ -127,9 +124,14 @@ const calcDisplaySummary = (account) => {
     .reduce((acc, interest) => acc + interest)}`;
 };
 
-calcDisplaySummary(account1);
+const updateUI = (currentAccount) => {
+  displayMovements(currentAccount.movements);
+  calcDisplayBalance(currentAccount);
+  calcDisplaySummary(currentAccount);
+};
 
 // Login
+// clear form, populate, and display ui, change welcome message
 let currentAccount;
 btnLogin.addEventListener("click", (e) => {
   e.preventDefault();
@@ -148,8 +150,30 @@ btnLogin.addEventListener("click", (e) => {
     inputLoginUsername.value = inputLoginPin.value = "";
     inputLoginPin.blur();
     inputLoginUsername.blur();
-    displayMovements(currentAccount.movements);
-    calcDisplayBalance(currentAccount.movements);
-    calcDisplaySummary(currentAccount);
+    updateUI(currentAccount);
+  }
+});
+
+// Money transfer
+
+btnTransfer.addEventListener("click", (e) => {
+  e.preventDefault();
+  const transferUserAccount = accounts.find(
+    (acc) => acc.username === inputTransferTo.value
+  );
+  const transferAmount = Number(inputTransferAmount.value);
+
+  if (
+    transferUserAccount &&
+    transferAmount > 0 &&
+    transferAmount <= currentAccount.balance &&
+    transferUserAccount.username !== currentAccount.username
+  ) {
+    transferUserAccount.movements.push(transferAmount);
+    currentAccount.movements.push(-transferAmount);
+    inputTransferTo.value = inputTransferAmount.value = "";
+    inputTransferTo.blur();
+    inputTransferAmount.blur();
+    updateUI(currentAccount);
   }
 });
