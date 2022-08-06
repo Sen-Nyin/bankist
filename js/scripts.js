@@ -177,3 +177,23 @@ btnTransfer.addEventListener("click", (e) => {
   inputTransferTo.blur();
   inputTransferAmount.blur();
 });
+
+// Delete Account
+
+btnClose.addEventListener("click", (e) => {
+  e.preventDefault();
+  const closeUsername = inputCloseUsername.value;
+  const closePin = Number(inputClosePin.value);
+  if (
+    closeUsername === currentAccount.username &&
+    closePin === currentAccount.pin
+  ) {
+    const index = accounts.findIndex((acc) => (acc.username = closeUsername));
+    accounts.splice(index, 1);
+    console.log("Account Closed");
+    containerApp.style.opacity = 0;
+  }
+  inputCloseUsername.value = inputClosePin.value = "";
+  inputClosePin.blur();
+  inputCloseUsername.blur();
+});
