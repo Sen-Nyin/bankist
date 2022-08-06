@@ -70,7 +70,7 @@ const displayMovements = function (movements) {
           <div class="movements__type movements__type--${type}">${
       index + 1
     } ${type}</div>
-          <div class="movements__value">${mov}</div>
+          <div class="movements__value">€${Math.abs(mov)}</div>
         </div>`;
 
     containerMovements.insertAdjacentHTML("afterbegin", html);
@@ -97,9 +97,38 @@ createUsername(accounts);
 // get the balance
 
 const calcDisplayBalance = (movements) => {
-  labelBalance.textContent = movements.reduce((acc, trans) => acc + trans, 0);
+  labelBalance.textContent = `€${movements.reduce(
+    (acc, trans) => acc + trans,
+    0
+  )}`;
 };
 calcDisplayBalance(account1.movements);
+
+// get total of deposits
+
+const calcDisplaySummary = (account) => {
+  // Deposits
+  labelSumIn.textContent = `€${account.movements
+    .filter((movement) => movement > 0)
+    .reduce((acc, curr) => (acc = curr))}`;
+
+  // Credits
+  labelSumOut.textContent = `€${Math.abs(
+    account.movements
+      .filter((movement) => movement < 0)
+      .reduce((acc, curr) => acc + curr)
+  )}`;
+
+  // Interest
+  labelSumInterest.textContent = `€${account.movements
+    .filter((movement) => movement > 0)
+    .map((deposit) => deposit * (account.interestRate / 100))
+    .filter((interest) => interest >= 1)
+    .reduce((acc, interest) => acc + interest)}`;
+};
+
+calcDisplaySummary(account1);
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
