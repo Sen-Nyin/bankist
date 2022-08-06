@@ -119,7 +119,7 @@ const calcDisplaySummary = (account) => {
       .reduce((acc, curr) => acc + curr)
   )}`;
 
-  // Interest
+  // Interest - paid on deposit, if interest is at least 1
   labelSumInterest.textContent = `€${account.movements
     .filter((movement) => movement > 0)
     .map((deposit) => deposit * (account.interestRate / 100))
@@ -129,16 +129,27 @@ const calcDisplaySummary = (account) => {
 
 calcDisplaySummary(account1);
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
+// Login
+let currentAccount;
+btnLogin.addEventListener("click", (e) => {
+  e.preventDefault();
 
-const currencies = new Map([
-  ["USD", "United States dollar"],
-  ["EUR", "Euro"],
-  ["GBP", "Pound sterling"],
-]);
+  currentAccount = accounts.find(
+    (acc) =>
+      inputLoginUsername.value === acc.username &&
+      Number(inputLoginPin.value) === acc.pin
+  );
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-
-/////////////////////////////////////////////////
+  if (currentAccount) {
+    labelWelcome.textContent = `Welcome back, ${currentAccount.owner
+      .split(" ")
+      .at(0)}`;
+    containerApp.style.opacity = 100;
+    inputLoginUsername.value = inputLoginPin.value = "";
+    inputLoginPin.blur();
+    inputLoginUsername.blur();
+    displayMovements(currentAccount.movements);
+    calcDisplayBalance(currentAccount.movements);
+    calcDisplaySummary(currentAccount);
+  }
+});
