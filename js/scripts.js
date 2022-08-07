@@ -178,6 +178,23 @@ btnTransfer.addEventListener("click", (e) => {
   inputTransferAmount.blur();
 });
 
+// Request a loan
+// Rule: at least one deposit that is at least 10% of the requested loan amount.
+
+btnLoan.addEventListener("click", (e) => {
+  e.preventDefault();
+  const amount = Number(inputLoanAmount.value);
+  if (
+    amount > 0 &&
+    currentAccount.movements.some((movement) => movement >= amount * 0.1)
+  ) {
+    currentAccount.movements.push(amount);
+    updateUI(currentAccount);
+  }
+  inputLoanAmount.value = "";
+  inputLoanAmount.blur();
+});
+
 // Delete Account
 
 btnClose.addEventListener("click", (e) => {
