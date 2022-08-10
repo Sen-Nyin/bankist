@@ -87,25 +87,32 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-const displayMovements = function (movements, sort = false) {
+const displayMovements = function (account, sort = false) {
   containerMovements.innerHTML = '';
 
-  const moves = sort ? movements.slice().sort((a, b) => a - b) : movements;
+  const moves = sort
+    ? account.movements.slice().sort((a, b) => a - b)
+    : account.movements;
 
   moves.forEach((mov, index) => {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
+    const transDate = new Date(account.movementsDates[index]);
+    const transDay = `${transDate.getDate()}`.padStart(2, 0);
+    const transMonth = `${transDate.getMonth() + 1}`.padStart(2, 0);
+    const transYear = transDate.getFullYear();
+    const displayDate = `${transDay}/${transMonth}/${transYear}`;
     const html = `
         <div class="movements__row">
           <div class="movements__type movements__type--${type}">${
       index + 1
     } ${type}</div>
+          <div class="movements__date">${displayDate}</div>
           <div class="movements__value">€${mov.toFixed(2)}</div>
         </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
-displayMovements(account1.movements);
 
 // Generate usernames - lower case initials of each name.
 // Loop over accounts array using forEach
@@ -156,7 +163,7 @@ const calcDisplaySummary = (account) => {
 };
 
 const updateUI = (currentAccount) => {
-  displayMovements(currentAccount.movements);
+  displayMovements(currentAccount);
   calcDisplayBalance(currentAccount);
   calcDisplaySummary(currentAccount);
 };
@@ -250,7 +257,7 @@ btnClose.addEventListener('click', (e) => {
 let sorted = false;
 btnSort.addEventListener('click', (e) => {
   e.preventDefault();
-  displayMovements(currentAccount.movements, !sorted);
+  displayMovements(currentAccount, !sorted);
   sorted = !sorted;
 });
 
