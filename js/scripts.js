@@ -206,9 +206,39 @@ const updateUI = (currentAccount) => {
   calcDisplaySummary(currentAccount);
 };
 
+// Logout Timer
+
+const startLogOutTimer = () => {
+  // set timer to 5 mins
+  let time = 120;
+
+  const ticker = () => {
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+    const sec = String(time % 60).padStart(2, 0);
+    // print remaining time to ui each call
+    labelTimer.textContent = `${min}:${sec}`;
+
+    // when expired, stop timer & logout
+    if (time === 0) {
+      clearInterval(timer);
+      labelWelcome.textContent = 'You have been logged out due to inactivity';
+      containerApp.style.opacity = 0;
+    }
+    // decrease 1s
+    time--;
+  };
+  ticker();
+  // call timer every second
+  const timer = setInterval(ticker, 1000);
+
+  // return the timer. Timer can then be set to variable to check if timer exists when switching accounts.
+  // if timer exists, it can then be cleareed before a new timer is initiated for the new user
+  return timer;
+};
+
 // Login
 // clear form, populate, and display ui, change welcome message
-let currentAccount;
+let currentAccount, timer;
 btnLogin.addEventListener('click', (e) => {
   e.preventDefault();
 
@@ -250,6 +280,8 @@ btnLogin.addEventListener('click', (e) => {
     ).format(now);
 
     labelDate.textContent = `As of ${formattedTime}`;
+    if (timer) clearInterval(timer);
+    timer = startLogOutTimer();
   }
 });
 
@@ -257,6 +289,9 @@ btnLogin.addEventListener('click', (e) => {
 
 btnTransfer.addEventListener('click', (e) => {
   e.preventDefault();
+  // reset logout timer
+  if (timer) clearInterval(timer);
+  timer = startLogOutTimer();
   const recipientAccount = accounts.find(
     (acc) => acc.username === inputTransferTo.value
   );
@@ -291,19 +326,24 @@ btnTransfer.addEventListener('click', (e) => {
 
 btnLoan.addEventListener('click', (e) => {
   e.preventDefault();
+  if (timer) clearInterval(timer);
+  timer = startLogOutTimer();
   const amount = Math.floor(inputLoanAmount.value);
   if (
     amount > 0 &&
     currentAccount.movements.some((movement) => movement >= amount * 0.1)
   ) {
-    currentAccount.movements.push(amount);
-    currentAccount.hasOwnProperty('movementsDates')
-      ? currentAccount.movementsDates.push(new Date().toISOString())
-      : (currentAccount.movementsDates = [new Date().toISOString()]);
-    updateUI(currentAccount);
+    setTimeout(() => {
+      currentAccount.movements.push(amount);
+      currentAccount.hasOwnProperty('movementsDates')
+        ? currentAccount.movementsDates.push(new Date().toISOString())
+        : (currentAccount.movementsDates = [new Date().toISOString()]);
+      updateUI(currentAccount);
+    }, 3000);
   }
   inputLoanAmount.value = '';
   inputLoanAmount.blur();
+  // reset logout timer
 });
 
 // Delete Account
