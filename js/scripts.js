@@ -96,6 +96,13 @@ const formatMovementDate = (date, locale) => {
   return new Intl.DateTimeFormat(locale).format(date);
 };
 
+const formatCurrency = (locale, currency, amount) => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+  }).format(amount);
+};
+
 // Display transactions
 
 const displayMovements = function (account, sort = false) {
@@ -109,13 +116,18 @@ const displayMovements = function (account, sort = false) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const date = new Date(account.movementsDates[index]);
     const displayDate = formatMovementDate(date, account.locale);
+    const formattedTransaction = formatCurrency(
+      account.locale,
+      account.currency,
+      mov
+    );
     const html = `
         <div class="movements__row">
           <div class="movements__type movements__type--${type}">${
       index + 1
     } ${type}</div>
           <div class="movements__date">${displayDate}</div>
-          <div class="movements__value">€${mov.toFixed(2)}</div>
+          <div class="movements__value">${formattedTransaction}</div>
         </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -142,32 +154,52 @@ createUsername(accounts);
 
 const calcDisplayBalance = (acc) => {
   acc.balance = acc.movements.reduce((acc, trans) => acc + trans, 0);
-  labelBalance.textContent = `€${acc.balance.toFixed(2)}`;
+  const formattedBalance = formatCurrency(
+    acc.locale,
+    acc.currency,
+    acc.balance
+  );
+  labelBalance.textContent = `${formattedBalance}`;
 };
 
 // get total of deposits
 
 const calcDisplaySummary = (account) => {
   // Deposits
-  labelSumIn.textContent = `€${account.movements
+  const depositTotal = account.movements
     .filter((movement) => movement > 0)
-    .reduce((acc, curr) => (acc = curr))
-    .toFixed(2)}`;
-
+    .reduce((acc, curr) => (acc = curr));
+  const formattedDepositTotal = formatCurrency(
+    account.locale,
+    account.currency,
+    depositTotal
+  );
+  labelSumIn.textContent = `${formattedDepositTotal}`;
   // Credits
-  labelSumOut.textContent = `€${Math.abs(
+  const credits = Math.abs(
     account.movements
       .filter((movement) => movement < 0)
       .reduce((acc, curr) => acc + curr)
-  ).toFixed(2)}`;
+  );
+  const formattedCredits = formatCurrency(
+    account.locale,
+    account.currency,
+    credits
+  );
+  labelSumOut.textContent = `${formattedCredits}`;
 
   // Interest - paid on deposit, if interest is at least 1
-  labelSumInterest.textContent = `€${account.movements
+  const interest = account.movements
     .filter((movement) => movement > 0)
     .map((deposit) => deposit * (account.interestRate / 100))
     .filter((interest) => interest >= 1)
-    .reduce((acc, interest) => acc + interest)
-    .toFixed(2)}`;
+    .reduce((acc, interest) => acc + interest);
+  const formattedInterest = formatCurrency(
+    account.locale,
+    account.currency,
+    interest
+  );
+  labelSumInterest.textContent = `${formattedInterest}`;
 };
 
 const updateUI = (currentAccount) => {
