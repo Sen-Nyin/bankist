@@ -169,24 +169,23 @@ const calcDisplaySummary = (account) => {
   const depositTotal = account.movements
     .filter((movement) => movement > 0)
     .reduce((acc, curr) => (acc = curr));
-  const formattedDepositTotal = formatCurrency(
+
+  labelSumIn.textContent = formatCurrency(
     account.locale,
     account.currency,
     depositTotal
   );
-  labelSumIn.textContent = `${formattedDepositTotal}`;
   // Credits
   const credits = Math.abs(
     account.movements
       .filter((movement) => movement < 0)
       .reduce((acc, curr) => acc + curr)
   );
-  const formattedCredits = formatCurrency(
+  labelSumOut.textContent = formatCurrency(
     account.locale,
     account.currency,
     credits
   );
-  labelSumOut.textContent = `${formattedCredits}`;
 
   // Interest - paid on deposit, if interest is at least 1
   const interest = account.movements
@@ -194,12 +193,11 @@ const calcDisplaySummary = (account) => {
     .map((deposit) => deposit * (account.interestRate / 100))
     .filter((interest) => interest >= 1)
     .reduce((acc, interest) => acc + interest);
-  const formattedInterest = formatCurrency(
+  labelSumInterest.textContent = formatCurrency(
     account.locale,
     account.currency,
     interest
   );
-  labelSumInterest.textContent = `${formattedInterest}`;
 };
 
 const updateUI = (currentAccount) => {
