@@ -75,11 +75,7 @@ const inputClosePin = document.querySelector('.form__input--pin');
 
 // Format Dates
 
-const formatMovementDate = (date) => {
-  const day = `${date.getDate()}`.padStart(2, 0);
-  const month = `${date.getMonth() + 1}`.padStart(2, 0);
-  const year = date.getFullYear();
-
+const formatMovementDate = (date, locale) => {
   const calcDaysPassed = (date1, date2) =>
     Math.round(Math.abs((date2 - date1) / (1000 * 60 * 60 * 24)));
 
@@ -91,7 +87,13 @@ const formatMovementDate = (date) => {
   } else if (daysPassed <= 7) {
     return `${daysPassed} days ago`;
   }
-  return `${day}/${month}/${year}`;
+
+  // const day = `${date.getDate()}`.padStart(2, 0);
+  // const month = `${date.getMonth() + 1}`.padStart(2, 0);
+  // const year = date.getFullYear();
+  // return `${day}/${month}/${year}`;
+
+  return new Intl.DateTimeFormat(locale).format(date);
 };
 
 // Display transactions
@@ -105,8 +107,8 @@ const displayMovements = function (account, sort = false) {
 
   moves.forEach((mov, index) => {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
-    const transDate = new Date(account.movementsDates[index]);
-    const displayDate = formatMovementDate(transDate);
+    const date = new Date(account.movementsDates[index]);
+    const displayDate = formatMovementDate(date, account.locale);
     const html = `
         <div class="movements__row">
           <div class="movements__type movements__type--${type}">${
@@ -197,14 +199,27 @@ btnLogin.addEventListener('click', (e) => {
     updateUI(currentAccount);
     // Set the date
 
-    const dateToday = new Date();
-    const day = `${dateToday.getDate()}`.padStart(2, 0);
-    const month = `${dateToday.getMonth() + 1}`.padStart(2, 0);
-    const year = dateToday.getFullYear();
-    const hours = dateToday.getHours();
-    const minutes = `${dateToday.getMinutes()}`.padStart(2, 0);
+    // const dateToday = new Date();
+    // const day = `${dateToday.getDate()}`.padStart(2, 0);
+    // const month = `${dateToday.getMonth() + 1}`.padStart(2, 0);
+    // const year = dateToday.getFullYear();
+    // const hours = dateToday.getHours();
+    // const minutes = `${dateToday.getMinutes()}`.padStart(2, 0);
+    // const locale = navigator.language;
+    const now = new Date();
+    const options = {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+    };
+    const formattedTime = Intl.DateTimeFormat(
+      currentAccount.locale,
+      options
+    ).format(now);
 
-    labelDate.textContent = `As of ${day}/${month}/${year} at ${hours}:${minutes}`;
+    labelDate.textContent = `As of ${formattedTime}`;
   }
 });
 
