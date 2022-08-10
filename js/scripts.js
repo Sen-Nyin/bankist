@@ -17,9 +17,9 @@ const account1 = {
     '2020-01-28T09:15:04.904Z',
     '2020-04-01T10:17:24.185Z',
     '2020-05-08T14:11:59.604Z',
-    '2020-07-26T17:01:17.194Z',
-    '2020-07-28T23:36:17.929Z',
-    '2020-08-01T10:51:36.790Z',
+    '2022-08-05T17:01:17.194Z',
+    '2022-08-09T23:36:17.929Z',
+    '2022-08-10T10:51:36.790Z',
   ],
   currency: 'EUR',
   locale: 'pt-PT', // de-DE
@@ -73,6 +73,29 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+// Format Dates
+
+const formatMovementDate = (date) => {
+  const day = `${date.getDate()}`.padStart(2, 0);
+  const month = `${date.getMonth() + 1}`.padStart(2, 0);
+  const year = date.getFullYear();
+
+  const calcDaysPassed = (date1, date2) =>
+    Math.round(Math.abs((date2 - date1) / (1000 * 60 * 60 * 24)));
+
+  const daysPassed = calcDaysPassed(new Date(), date);
+  if (daysPassed === 0) {
+    return 'Today';
+  } else if (daysPassed === 1) {
+    return 'Yesterday';
+  } else if (daysPassed <= 7) {
+    return `${daysPassed} days ago`;
+  }
+  return `${day}/${month}/${year}`;
+};
+
+// Display transactions
+
 const displayMovements = function (account, sort = false) {
   containerMovements.innerHTML = '';
 
@@ -83,10 +106,7 @@ const displayMovements = function (account, sort = false) {
   moves.forEach((mov, index) => {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const transDate = new Date(account.movementsDates[index]);
-    const transDay = `${transDate.getDate()}`.padStart(2, 0);
-    const transMonth = `${transDate.getMonth() + 1}`.padStart(2, 0);
-    const transYear = transDate.getFullYear();
-    const displayDate = `${transDay}/${transMonth}/${transYear}`;
+    const displayDate = formatMovementDate(transDate);
     const html = `
         <div class="movements__row">
           <div class="movements__type movements__type--${type}">${
@@ -175,6 +195,16 @@ btnLogin.addEventListener('click', (e) => {
     inputLoginPin.blur();
     inputLoginUsername.blur();
     updateUI(currentAccount);
+    // Set the date
+
+    const dateToday = new Date();
+    const day = `${dateToday.getDate()}`.padStart(2, 0);
+    const month = `${dateToday.getMonth() + 1}`.padStart(2, 0);
+    const year = dateToday.getFullYear();
+    const hours = dateToday.getHours();
+    const minutes = `${dateToday.getMinutes()}`.padStart(2, 0);
+
+    labelDate.textContent = `As of ${day}/${month}/${year} at ${hours}:${minutes}`;
   }
 });
 
@@ -258,14 +288,3 @@ btnSort.addEventListener('click', (e) => {
   displayMovements(currentAccount, !sorted);
   sorted = !sorted;
 });
-
-// Set the date
-
-const dateToday = new Date();
-const day = `${dateToday.getDate()}`.padStart(2, 0);
-const month = `${dateToday.getMonth() + 1}`.padStart(2, 0);
-const year = dateToday.getFullYear();
-const hours = dateToday.getHours();
-const minutes = dateToday.getMinutes();
-
-labelDate.textContent = `As of ${day}/${month}/${year} at ${hours}:${minutes}`;
