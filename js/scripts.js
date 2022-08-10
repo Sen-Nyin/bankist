@@ -168,7 +168,7 @@ const calcDisplaySummary = (account) => {
   // Deposits
   const depositTotal = account.movements
     .filter((movement) => movement > 0)
-    .reduce((acc, curr) => (acc = curr));
+    .reduce((acc, curr) => acc + curr);
 
   labelSumIn.textContent = formatCurrency(
     account.locale,
