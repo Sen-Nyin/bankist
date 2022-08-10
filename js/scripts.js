@@ -45,21 +45,7 @@ const account2 = {
   locale: 'en-US',
 };
 
-const account3 = {
-  owner: 'Steven Thomas Williams',
-  movements: [200, -200, 340, -300, -20, 50, 400, -460],
-  interestRate: 0.7,
-  pin: 3333,
-};
-
-const account4 = {
-  owner: 'Sarah Smith',
-  movements: [430, 1000, 700, 50, 90],
-  interestRate: 1,
-  pin: 4444,
-};
-
-const accounts = [account1, account2, account3, account4];
+const accounts = [account1, account2];
 
 // Elements
 const labelWelcome = document.querySelector('.welcome');
@@ -209,6 +195,15 @@ btnTransfer.addEventListener('click', (e) => {
   ) {
     recipientAccount.movements.push(transferAmount);
     currentAccount.movements.push(-transferAmount);
+
+    // transfer date
+    recipientAccount.hasOwnProperty('movementsDates')
+      ? recipientAccount.movementsDates.push(new Date().toISOString())
+      : (recipientAccount.movementsDates = [new Date().toISOString()]);
+    currentAccount.hasOwnProperty('movementsDates')
+      ? currentAccount.movementsDates.push(new Date().toISOString())
+      : (currentAccount.movementsDates = [new Date().toISOString()]);
+
     updateUI(currentAccount);
   }
   inputTransferTo.value = inputTransferAmount.value = '';
@@ -227,6 +222,9 @@ btnLoan.addEventListener('click', (e) => {
     currentAccount.movements.some((movement) => movement >= amount * 0.1)
   ) {
     currentAccount.movements.push(amount);
+    currentAccount.hasOwnProperty('movementsDates')
+      ? currentAccount.movementsDates.push(new Date().toISOString())
+      : (currentAccount.movementsDates = [new Date().toISOString()]);
     updateUI(currentAccount);
   }
   inputLoanAmount.value = '';
